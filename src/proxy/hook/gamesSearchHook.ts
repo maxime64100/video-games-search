@@ -1,31 +1,23 @@
 import { useEffect, useState } from "react";
+import type { Game } from "./gamesHook";
 
-export type Game = {
-  id: number;
-  name: string;
-  background_image?: string | null;
-  released?: string | null;
-  rating?: number | null;
-};
-
-export function useGames() {
+export function useGameSearch(searchTerm: string = "") {
   const [games, setGames] = useState<Game[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const API_KEY = "5032cff4417948c7b29bb121fe3a5291";
+  const normalizedSearch = searchTerm.trim();
 
   useEffect(() => {
+    if (!normalizedSearch) {
+      setGames([]);
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
+
     const controller = new AbortController();
     let isActive = true;
-    //je veux les jeux sortis sur le mois il y a 2 mois
-    const currentDate = new Date();
-    const currentMonth = `${currentDate.getFullYear()}-${String(
-      currentDate.getMonth() + 1,
-    ).padStart(2, "0")}`;
-    const lastMonth = `${currentDate.getFullYear()}-${String(
-      currentDate.getMonth() - 2,
-    ).padStart(2, "0")}`;
-
 
     const fetchGames = async () => {
       setIsLoading(true);
@@ -35,8 +27,11 @@ export function useGames() {
         const params = new URLSearchParams({
           key: API_KEY,
           page_size: "40",
-          dates: `${lastMonth},${currentMonth}`,
         });
+
+        if (normalizedSearch) {
+          params.append("search", normalizedSearch);
+        }
 
         const response = await fetch(`https://api.rawg.io/api/games?${params.toString()}`, {
           signal: controller.signal,
@@ -67,7 +62,7 @@ export function useGames() {
       isActive = false;
       controller.abort();
     };
-  }, []);
+  }, [normalizedSearch]);
 
   return { games, isLoading, error };
 }

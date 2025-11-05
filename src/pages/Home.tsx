@@ -1,20 +1,13 @@
-import { type FormEvent, type KeyboardEvent, type MouseEvent, useState } from 'react';
+import { type KeyboardEvent, type MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFavorites } from '../context/FavoritesContext';
 import { useGames } from '../proxy/hook/gamesHook';
 import './Home.css';
 
 export function Home() {
-  const [searchValue, setSearchValue] = useState('');
-  const [query, setQuery] = useState('');
-  const { games, isLoading, error } = useGames(query);
+  const { games, isLoading, error } = useGames();
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const navigate = useNavigate();
-
-  const handleSearch = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setQuery(searchValue.trim());
-  };
 
   const handleCardActivate = (gameId: number) => {
     navigate(`/jeux/${gameId}`);
@@ -51,29 +44,14 @@ export function Home() {
       <header className="home__header">
         <h1 className="home__title">Accueil</h1>
         <p className="home__description">
-          Bienvenue sur la page d'accueil qui permet de rechercher des jeux vidéos !
+          Bienvenue sur la page d'accueil, c'est ici que vous pouvez découvrir les dernières sorties de jeux vidéo !
         </p>
       </header>
-
-      <form className="home__search" onSubmit={handleSearch}>
-        <input
-          className="home__search-input"
-          type="text"
-          placeholder="Rechercher un jeu vidéo..."
-          value={searchValue}
-          onChange={(event) => setSearchValue(event.target.value)}
-        />
-        <button className="home__search-button" type="submit">
-          Rechercher
-        </button>
-      </form>
 
       {error && <p className="home__status home__status--error">Erreur : {error}</p>}
       {isLoading && <p className="home__status">Chargement des jeux en cours…</p>}
       {!isLoading && !error && games.length === 0 && (
-        <p className="home__empty">
-          {query ? `Aucun jeu trouvé pour « ${query} ».` : "Aucun jeu disponible pour le moment."}
-        </p>
+        <p className="home__empty">Aucun jeu disponible pour le moment.</p>
       )}
 
       <div className="home__grid">
