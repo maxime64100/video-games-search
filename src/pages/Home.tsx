@@ -1,4 +1,5 @@
 import { type FormEvent, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useGames } from '../proxy/hook/gamesHook';
 import './Home.css';
 
@@ -61,6 +62,7 @@ export function Home() {
             )}
             <div className="game-card__body">
               <h2 className="game-card__title">{game.name}</h2>
+              <Link to={`/jeux/${game.id}`}>Voir les détails</Link>
               {game.released && (
                 <p className="game-card__meta">
                   Sortie&nbsp;: <span>{new Date(game.released).toLocaleDateString()}</span>
