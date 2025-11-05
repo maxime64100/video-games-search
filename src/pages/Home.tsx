@@ -1,20 +1,12 @@
-import { type FormEvent, useMemo, useState } from 'react';
+import { type FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGames } from '../proxy/hook/gamesHook';
 import './Home.css';
 
 export function Home() {
-  const { games } = useGames();
   const [searchValue, setSearchValue] = useState('');
   const [query, setQuery] = useState('');
-
-  const filteredGames = useMemo(() => {
-    if (!query) {
-      return games;
-    }
-    const lowerQuery = query.toLowerCase();
-    return games.filter((game) => game.name.toLowerCase().includes(lowerQuery));
-  }, [games, query]);
+  const { games, isLoading, error } = useGames(query);
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -43,12 +35,16 @@ export function Home() {
         </button>
       </form>
 
-      {query && filteredGames.length === 0 && (
-        <p className="home__empty">Aucun jeu trouvé pour « {query} ».</p>
+      {error && <p className="home__status home__status--error">Erreur : {error}</p>}
+      {isLoading && <p className="home__status">Chargement des jeux en cours…</p>}
+      {!isLoading && !error && games.length === 0 && (
+        <p className="home__empty">
+          {query ? `Aucun jeu trouvé pour « ${query} ».` : "Aucun jeu disponible pour le moment."}
+        </p>
       )}
 
       <div className="home__grid">
-        {filteredGames.map((game) => (
+        {games.map((game) => (
           <article className="game-card" key={game.id}>
             {game.background_image ? (
               <img

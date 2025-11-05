@@ -72,6 +72,18 @@
   width: 100%;
 }
 
+.home__status {
+  margin: 0;
+  color: #4b5563;
+  font-style: italic;
+}
+
+.home__status--error {
+  color: #f87171;
+  font-style: normal;
+  font-weight: 600;
+}
+
 .home__empty {
   margin: 0;
   color: #6b7280;
