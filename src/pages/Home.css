@@ -98,6 +98,8 @@
   display: flex;
   flex-direction: column;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  cursor: pointer;
 }
 
 .game-card:hover {
@@ -134,6 +136,44 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+}
+
+.game-card__favorite {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  padding: 0.1rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform 0.2s ease, color 0.2s ease;
+  z-index: 1;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.game-card__favorite:hover {
+  transform: scale(1.1);
+  color: rgba(253, 224, 71, 0.9);
+}
+
+.game-card__favorite--active {
+  color: #facc15;
+  text-shadow: 0 4px 12px rgba(250, 204, 21, 0.45);
+}
+
+.game-card__favorite:focus-visible {
+  outline: 2px solid #facc15;
+  outline-offset: 3px;
+}
+
+.game-card:focus-visible {
+  outline: 3px solid rgba(77, 148, 255, 0.6);
+  outline-offset: 4px;
 }
 
 .game-card__title {

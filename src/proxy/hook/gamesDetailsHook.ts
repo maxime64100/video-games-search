@@ -47,7 +47,7 @@ export function useGameDetails(id: number | undefined) {
     };
 
     fetchGameDetails();
-  }, [id]);
+  }, [id, API_KEY]);
 
   return { game, isLoading, error };
 }

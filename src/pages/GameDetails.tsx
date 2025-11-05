@@ -1,5 +1,6 @@
-import { useParams } from 'react-router-dom';
 import { useMemo } from 'react';
+import { useParams } from 'react-router-dom';
+import { useFavorites } from '../context/FavoritesContext';
 import { useGameDetails } from '../proxy/hook/gamesDetailsHook';
 import './GameDetails.css';
 
@@ -7,6 +8,7 @@ export function GameDetails() {
   const { id } = useParams();
   const numericId = id ? Number(id) : undefined;
   const { game, isLoading, error } = useGameDetails(numericId);
+  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const platformList = useMemo(
     () =>
       game?.platforms
@@ -62,6 +64,8 @@ export function GameDetails() {
     );
   }
 
+  const favoriteActive = isFavorite(game.id);
+
   return (
     <section className="game-details">
       <div
@@ -88,6 +92,29 @@ export function GameDetails() {
               Metacritic&nbsp;: <strong>{game.metacritic ?? '–'}</strong>
             </span>
           </div>
+          <button
+            className={`game-details__favorite ${favoriteActive ? 'game-details__favorite--active' : ''}`}
+            type="button"
+            aria-pressed={favoriteActive}
+            aria-label={
+              favoriteActive
+                ? `Retirer ${game.name} des favoris`
+                : `Ajouter ${game.name} aux favoris`
+            }
+            onClick={() =>
+              favoriteActive
+                ? removeFavorite(game.id)
+                : addFavorite({
+                    id: game.id,
+                    name: game.name,
+                    background_image: game.background_image,
+                    released: game.released,
+                    rating: game.rating,
+                  })
+            }
+          >
+            {favoriteActive ? '★' : '☆'}
+          </button>
         </div>
       </div>
 
@@ -95,7 +122,9 @@ export function GameDetails() {
         <div className="game-details__grid">
           <article className="game-details__card">
             <h2 className="game-details__card-title">Présentation</h2>
-                <p className="game-details__text">{game.description_raw ?? 'La description du jeu est momentanément indisponible.'}</p>
+            <p className="game-details__text">
+              {game.description_raw ?? 'La description du jeu est momentanément indisponible.'}
+            </p>
           </article>
 
           <article className="game-details__card">
