@@ -1,16 +1,34 @@
-import { type FormEvent, type KeyboardEvent, type MouseEvent, useState } from 'react';
+import { type FormEvent, type KeyboardEvent, type MouseEvent, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFavorites } from '../context/FavoritesContext';
-import { useGameSearch } from '../proxy/hook/gamesSearchHook';
+import { useGameSearch, type SearchFilters } from '../proxy/hook/gamesSearchHook';
+import { useRawgFilters } from '../proxy/hook/rawgFiltersHook';
 import type { Game } from '../proxy/hook/gamesHook';
 import './Search.css';
 
 export function Search() {
   const [searchValue, setSearchValue] = useState('');
   const [query, setQuery] = useState('');
-  const { games, isLoading, error } = useGameSearch(query);
+  const [selectedGenre, setSelectedGenre] = useState('');
+  const [selectedPlatform, setSelectedPlatform] = useState('');
+  const [minRating, setMinRating] = useState('');
+  const { genres, platforms, isLoading: filtersLoading, error: filtersError } = useRawgFilters();
+  const filters = useMemo<SearchFilters>(
+    () => ({
+      genreSlug: selectedGenre || undefined,
+      platformId: selectedPlatform ? Number(selectedPlatform) : undefined,
+      minRating:
+        minRating && !Number.isNaN(Number(minRating))
+          ? Math.min(Math.max(Number(minRating), 0), 5)
+          : undefined,
+    }),
+    [selectedGenre, selectedPlatform, minRating],
+  );
+  const { games, isLoading, error } = useGameSearch(query, filters);
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const navigate = useNavigate();
+  const hasActiveFilters = Boolean(selectedGenre || selectedPlatform || minRating);
+  const hasSearchContext = Boolean(query || hasActiveFilters);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -38,6 +56,31 @@ export function Search() {
     }
   };
 
+  const handleResetFilters = () => {
+    setSelectedGenre('');
+    setSelectedPlatform('');
+    setMinRating('');
+  };
+
+  const handleMinRatingChange = (value: string) => {
+    const normalized = value.replace(',', '.');
+    setMinRating(normalized);
+  };
+
+  const handleMinRatingBlur = () => {
+    if (!minRating.trim()) {
+      return;
+    }
+    const numeric = Number(minRating);
+    if (Number.isNaN(numeric)) {
+      setMinRating('');
+      return;
+    }
+    const clamped = Math.min(Math.max(numeric, 0), 5);
+    const rounded = Math.round(clamped * 10) / 10;
+    setMinRating(Number(rounded.toFixed(1)).toString());
+  };
+
   return (
     <div className="search">
       <header className="search__header">
@@ -60,15 +103,98 @@ export function Search() {
         </button>
       </form>
 
+      <section className="search__filters" aria-live="polite">
+        <div className="search__filters-grid">
+          <label className="search__label" htmlFor="genre-filter">
+            Type de jeu
+            <select
+              id="genre-filter"
+              className="search__select"
+              value={selectedGenre}
+              disabled={filtersLoading || genres.length === 0}
+              onChange={(event) => setSelectedGenre(event.target.value)}
+            >
+              <option value="">Tous les genres</option>
+              {genres.map((genre) => (
+                <option key={genre.id} value={genre.slug ?? genre.id}>
+                  {genre.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="search__label" htmlFor="platform-filter">
+            Plateforme
+            <select
+              id="platform-filter"
+              className="search__select"
+              value={selectedPlatform}
+              disabled={filtersLoading || platforms.length === 0}
+              onChange={(event) => setSelectedPlatform(event.target.value)}
+            >
+              <option value="">Toutes les plateformes</option>
+              {platforms.map((platform) => (
+                <option key={platform.id} value={platform.id}>
+                  {platform.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="search__label" htmlFor="rating-filter">
+            Note minimale
+            <div className="search__number-wrapper">
+              <input
+                id="rating-filter"
+                className="search__number-input"
+                type="number"
+                min="0"
+                max="5"
+                step="0.1"
+                inputMode="decimal"
+                placeholder="ex : 4.2"
+                value={minRating}
+                onChange={(event) => handleMinRatingChange(event.target.value)}
+                onBlur={handleMinRatingBlur}
+                aria-label="Filtrer par note minimale"
+              />
+              <span className="search__input-hint">Valeur comprise entre 0 et 5 (précision 0,1).</span>
+            </div>
+          </label>
+        </div>
+
+        <div className="search__filters-footer">
+          {filtersLoading && (
+            <p className="search__filters-status">Chargement des filtres…</p>
+          )}
+          {filtersError && (
+            <p className="search__filters-status search__filters-status--error">
+              Impossible de charger les filtres : {filtersError}
+            </p>
+          )}
+          {hasActiveFilters && (
+            <button className="search__filters-reset" type="button" onClick={handleResetFilters}>
+              Réinitialiser les filtres
+            </button>
+          )}
+        </div>
+      </section>
+
       {error && <p className="search__status search__status--error">Erreur : {error}</p>}
       {isLoading && <p className="search__status">Recherche en cours…</p>}
-      {query && !isLoading && !error && games.length === 0 && (
-        <p className="search__empty">Aucun jeu trouvé pour « {query} ».</p>
+      {hasSearchContext && !isLoading && !error && games.length === 0 && (
+        <p className="search__empty">
+          {query
+            ? `Aucun jeu trouvé pour « ${query} ».`
+            : 'Aucun jeu ne correspond aux filtres sélectionnés.'}
+        </p>
       )}
 
-      {query && games.length > 0 && (
+      {hasSearchContext && games.length > 0 && (
         <div className="search__results">
-          <h2 className="search__results-title">Résultats pour « {query} »</h2>
+          <h2 className="search__results-title">
+            {query ? `Résultats pour « ${query} »` : 'Résultats par filtres'}
+          </h2>
           <div className="search__grid">
             {games.map((game) => {
               const active = isFavorite(game.id);
