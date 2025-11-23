@@ -5,7 +5,7 @@
   width: 100%;
   min-height: 100vh;
   padding: 3rem clamp(2rem, 5vw, 4rem);
-  background: linear-gradient(180deg, #f8f9ff 0%, #eef2ff 50%, #ffffff 100%);
+  background: var(--panel-gradient);
   box-sizing: border-box;
 }
 
@@ -19,13 +19,13 @@
 .home__title {
   margin: 0;
   font-size: clamp(2rem, 4vw, 3rem);
-  color: #1f2933;
+  color: var(--text-color);
 }
 
 .home__description {
   margin: 0;
   font-size: 1.125rem;
-  color: #4b5563;
+  color: var(--muted-color);
 }
 
 .home__search {
@@ -37,7 +37,7 @@
 .home__search-input {
   flex: 1 1 280px;
   padding: 0.85rem 1.1rem;
-  border: 1px solid #c7c9d9;
+  border: 1px solid var(--card-border);
   border-radius: 0.9rem;
   font-size: 1rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -51,7 +51,7 @@
 
 .home__search-button {
   padding: 0.85rem 1.8rem;
-  background: linear-gradient(135deg, #7a5cff, #4d94ff);
+  background: var(--primary-gradient);
   color: #fff;
   border: none;
   border-radius: 0.9rem;
@@ -74,7 +74,7 @@
 
 .home__status {
   margin: 0;
-  color: #4b5563;
+  color: var(--muted-color);
   font-style: italic;
 }
 
@@ -86,15 +86,15 @@
 
 .home__empty {
   margin: 0;
-  color: #6b7280;
+  color: var(--subtle-color);
   font-style: italic;
 }
 
 .game-card {
-  background: #fff;
+  background: var(--card-bg);
   border-radius: 1.25rem;
   overflow: hidden;
-  box-shadow: 0 12px 30px rgba(30, 40, 80, 0.15);
+  box-shadow: 0 12px 30px var(--shadow-medium);
   display: flex;
   flex-direction: column;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -104,7 +104,7 @@
 
 .game-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 18px 36px rgba(30, 40, 80, 0.2);
+  box-shadow: 0 18px 36px var(--shadow-strong);
 }
 
 .game-card__image {
@@ -179,18 +179,29 @@
 .game-card__title {
   margin: 0;
   font-size: 1.2rem;
-  color: #1f2933;
+  color: var(--text-color);
 }
 
 .game-card__meta {
   margin: 0;
   font-size: 0.95rem;
-  color: #4b5563;
+  color: var(--muted-color);
 }
 
 .game-card__meta span {
   font-weight: 600;
-  color: #1f2933;
+  color: var(--text-color);
+}
+
+.theme-dark .game-card__placeholder {
+  background: repeating-linear-gradient(
+    135deg,
+    #0f172a,
+    #0f172a 12px,
+    #111827 12px,
+    #111827 24px
+  );
+  color: var(--muted-color);
 }
 
 @media (max-width: 640px) {

@@ -2,8 +2,7 @@
   width: 100%;
   min-height: 100vh;
   padding: 3rem clamp(2rem, 5vw, 4rem);
-  background: radial-gradient(circle at top right, rgba(122, 92, 255, 0.15), transparent 55%),
-    linear-gradient(180deg, #ffffff 0%, #f5f7ff 100%);
+  background: var(--panel-gradient);
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -20,18 +19,18 @@
 .favorites__title {
   margin: 0;
   font-size: clamp(2.1rem, 4vw, 2.8rem);
-  color: #1f2933;
+  color: var(--text-color);
 }
 
 .favorites__subtitle {
   margin: 0;
   font-size: 1.1rem;
-  color: #4b5563;
+  color: var(--muted-color);
 }
 
 .favorites__empty {
   margin: 0;
-  color: #6b7280;
+  color: var(--subtle-color);
   font-style: italic;
   font-size: 1.05rem;
 }
@@ -43,10 +42,10 @@
 }
 
 .favorites-card {
-  background: #fff;
+  background: var(--card-bg);
   border-radius: 1.35rem;
   overflow: hidden;
-  box-shadow: 0 18px 42px rgba(30, 41, 59, 0.15);
+  box-shadow: 0 18px 42px var(--shadow-medium);
   display: flex;
   flex-direction: column;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -56,7 +55,7 @@
 
 .favorites-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 22px 48px rgba(30, 41, 59, 0.2);
+  box-shadow: 0 22px 48px var(--shadow-strong);
 }
 
 .favorites-card__image {
@@ -93,18 +92,18 @@
 .favorites-card__title {
   margin: 0;
   font-size: 1.25rem;
-  color: #1f2933;
+  color: var(--text-color);
 }
 
 .favorites-card__meta {
   margin: 0;
   font-size: 0.95rem;
-  color: #4b5563;
+  color: var(--muted-color);
 }
 
 .favorites-card__meta span {
   font-weight: 600;
-  color: #1f2933;
+  color: var(--text-color);
 }
 
 .favorites-card__favorite {
@@ -140,6 +139,17 @@
   outline-offset: 3px;
 }
 
+.theme-dark .favorites-card__placeholder {
+  background: repeating-linear-gradient(
+    135deg,
+    #0f172a,
+    #0f172a 14px,
+    #111827 14px,
+    #111827 28px
+  );
+  color: var(--muted-color);
+}
+
 @media (max-width: 640px) {
   .favorites {
     padding: 2.5rem 1.5rem 3rem;
@@ -149,5 +159,4 @@
     align-items: center;
     text-align: center;
   }
-
 }
