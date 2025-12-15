@@ -17,7 +17,6 @@ export function useGames() {
   useEffect(() => {
     const controller = new AbortController();
     let isActive = true;
-    //je veux les jeux sortis sur le mois il y a 2 mois
     const currentDate = new Date();
     const currentMonth = `${currentDate.getFullYear()}-${String(
       currentDate.getMonth() + 1,

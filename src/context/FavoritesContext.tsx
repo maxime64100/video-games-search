@@ -7,6 +7,8 @@ import {
   useMemo,
   useState,
 } from 'react';
+import api from '../services/api';
+import { useAuth } from './AuthContext';
 
 export type FavoriteGame = {
   id: number;
@@ -21,46 +23,65 @@ type FavoritesContextValue = {
   addFavorite: (game: FavoriteGame) => void;
   removeFavorite: (id: number) => void;
   isFavorite: (id: number) => boolean;
+  isLoading: boolean;
+  error: string | null;
 };
 
 const FavoritesContext = createContext<FavoritesContextValue | undefined>(undefined);
 
-const STORAGE_KEY = 'favorites::games';
-
 export function FavoritesProvider({ children }: PropsWithChildren) {
-  const [favorites, setFavorites] = useState<FavoriteGame[]>(() => {
-    if (typeof window === 'undefined') {
-      return [];
-    }
-    try {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      if (!stored) {
-        return [];
-      }
-      const parsed = JSON.parse(stored);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  });
+  const { isAuthenticated } = useAuth();
+  const [favorites, setFavorites] = useState<FavoriteGame[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
+  // Charger les favoris depuis le backend
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
+    if (!isAuthenticated) {
+      setFavorites([]);
+      return;
     }
-  }, [favorites]);
 
-  const addFavorite = useCallback((game: FavoriteGame) => {
-    setFavorites((prev) => {
-      if (prev.some((item) => item.id === game.id)) {
-        return prev;
+    const fetchFavorites = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const res = await api.get('/favorites');
+        setFavorites(res.data);
+      } catch (err) {
+        console.error('Erreur chargement favoris', err);
+        setError("Impossible de charger les favoris.");
+      } finally {
+        setIsLoading(false);
       }
-      return [...prev, game];
-    });
+    };
+
+    fetchFavorites();
+  }, [isAuthenticated]);
+
+  const addFavorite = useCallback(async (game: FavoriteGame) => {
+    // Optimistic update impossible easily without ID from backend if creation generates ID,
+    // but here game has ID. We could do optimistic.
+    // For safety, let's just call API then update state.
+
+    try {
+      await api.post('/favorites', game);
+      setFavorites((prev) => [...prev, game]);
+    } catch (err) {
+      console.error("Erreur ajout favori", err);
+      // Gérer l'erreur (toast, alert...)
+      setError("Erreur lors de l'ajout aux favoris.");
+    }
   }, []);
 
-  const removeFavorite = useCallback((id: number) => {
-    setFavorites((prev) => prev.filter((item) => item.id !== id));
+  const removeFavorite = useCallback(async (id: number) => {
+    try {
+      await api.delete(`/favorites/${id}`);
+      setFavorites((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      console.error("Erreur suppression favori", err);
+      setError("Erreur lors de la suppression des favoris.");
+    }
   }, []);
 
   const isFavorite = useCallback(
@@ -74,8 +95,10 @@ export function FavoritesProvider({ children }: PropsWithChildren) {
       addFavorite,
       removeFavorite,
       isFavorite,
+      isLoading,
+      error
     }),
-    [favorites, addFavorite, removeFavorite, isFavorite],
+    [favorites, addFavorite, removeFavorite, isFavorite, isLoading, error],
   );
 
   return <FavoritesContext.Provider value={value}>{children}</FavoritesContext.Provider>;
