@@ -1,0 +1,24 @@
+{
+  "users": [
+    {
+      "id": 25881,
+      "email": "maximefallek1@gmail.com",
+      "password": "test",
+      "pseudo": "maximefallek1"
+    }
+  ],
+  "guides": [
+    {
+      "id": 61653,
+      "title": "zeiuhyiuze",
+      "content": "fcliezhiuzeagdiuzjgediuzejgbf",
+      "gameId": 891238,
+      "gameName": "Hades II",
+      "authorId": 25881,
+      "authorPseudo": "maximefallek1",
+      "createdAt": "2025-12-15T11:14:50.995Z",
+      "updatedAt": "2025-12-15T11:14:50.995Z"
+    }
+  ],
+  "favorites": []
+}
