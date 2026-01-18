@@ -97,7 +97,7 @@ const authenticateToken = (req, res, next) => {
   if (!token) return res.status(401).json({ error: 'Non authentifié' });
 
   jwt.verify(token, SECRET_KEY, (err, user) => {
-    if (err) return res.status(403).json({ error: 'Token invalide ou expiré' });
+    if (err) return res.status(401).json({ error: 'Token invalide ou expiré' });
     req.user = user; // { id, email, pseudo, iat, exp }
     next();
   });

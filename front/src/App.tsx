@@ -12,6 +12,8 @@ import { Register } from './pages/Register';
 import { PublicProfile } from './pages/PublicProfile';
 import { GuidesPage } from './pages/GuidesPage';
 import { CreateGuide } from './pages/CreateGuide';
+import { GuideDetails } from './pages/GuideDetails';
+import { EditGuide } from './pages/EditGuide';
 import './App.css';
 
 function Navigation() {
@@ -138,9 +140,15 @@ function App() {
               
               <Route path="/profile/:id" element={<PublicProfile />} />
               <Route path="/guides" element={<GuidesPage />} />
+              <Route path="/guides/:id" element={<GuideDetails />} />
               <Route path="/guides/new" element={
                 <PrivateRoute>
                   <CreateGuide />
+                </PrivateRoute>
+              } />
+              <Route path="/guides/:id/edit" element={
+                <PrivateRoute>
+                  <EditGuide />
                 </PrivateRoute>
               } />
 

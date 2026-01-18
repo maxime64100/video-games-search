@@ -17,12 +17,15 @@ export function useGames() {
     const controller = new AbortController();
     let isActive = true;
     const currentDate = new Date();
-    const currentMonth = `${currentDate.getFullYear()}-${String(
-      currentDate.getMonth() + 1,
-    ).padStart(2, "0")}`;
-    const lastMonth = `${currentDate.getFullYear()}-${String(
-      currentDate.getMonth() - 2,
-    ).padStart(2, "0")}`;
+    const pastDate = new Date();
+    pastDate.setMonth(pastDate.getMonth() - 2);
+
+    const formatDate = (date: Date) => {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    };
+
+    const currentMonth = formatDate(currentDate);
+    const lastMonth = formatDate(pastDate);
 
 
     const fetchGames = async () => {
